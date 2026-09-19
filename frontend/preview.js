@@ -9,12 +9,18 @@ if (!data.name) {
 
 let accentRGB = [167, 139, 250];
 
+
+const API_URL = 'https://instapage-backend.onrender.com';
+
+
+
 // ============================================
 // AI STYLE
 // ============================================
 async function applyStyle() {
     try {
-        const resp = await fetch('/api/generate-style', {
+        // const API_URL = 'https://instapage-backend.onrender.com';
+        const resp = await fetch(`${API_URL}/api/generate-style`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -150,7 +156,7 @@ function injectData() {
         if (data.music.link) {
             playEl.href = data.music.link;
             if (data.music.link.includes('spotify.com')) {
-                fetch(`/api/spotify-oembed?url=${encodeURIComponent(data.music.link)}`)
+                fetch(`${API_URL}/api/spotify-oembed?url=${encodeURIComponent(data.music.link)}`)
                     .then(r => r.json())
                     .then(d => {
                         if (d.thumbnail_url) {
@@ -232,7 +238,7 @@ async function deployPage() {
     try {
         const fullHtml = buildDeployableHtml();
 
-        const resp = await fetch('/api/deploy', {
+        const resp = await fetch('${API_URL}/api/deploy', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

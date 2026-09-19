@@ -376,8 +376,10 @@ fetchBtn.addEventListener('click', async () => {
     fetchBtn.disabled = true;
     fetchHint.textContent = 'Fetching...';
 
+    const API_URL = 'https://instapage-backend.onrender.com';
+
     try {
-        const resp = await fetch(`/api/fetch-insta?username=${encodeURIComponent(username)}`);
+        const resp = await fetch(`${API_URL}/api/fetch-insta?username=${encodeURIComponent(username)}`);
         const data = await resp.json();
 
         if (data.success) {
