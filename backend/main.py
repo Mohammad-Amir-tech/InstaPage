@@ -246,7 +246,7 @@ async def deploy_page(req: DeployRequest):
             shutil.rmtree(temp_dir, ignore_errors=True)
 
         # ⭐ User link banao
-        user_url = f"https://{CLOUDFLARE_PROJECT_NAME}.pages.dev/{username}"
+        user_url = f"https://{CLOUDFLARE_PROJECT_NAME}.pages.dev/{username}/"
 
         return {
             "success": True,
