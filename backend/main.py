@@ -3,6 +3,7 @@ import json
 import re
 import io
 import zipfile
+import hashlib
 import pathlib
 import httpx
 from fastapi import FastAPI, HTTPException, Request
@@ -30,7 +31,11 @@ client = AsyncOpenAI(
     base_url="https://api.groq.com/openai/v1",
 )
 MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-NETLIFY_TOKEN = os.getenv("NETLIFY_TOKEN")
+
+# ⭐ Cloudflare credentials
+CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
+CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN")
+CLOUDFLARE_PROJECT_NAME = os.getenv("CLOUDFLARE_PROJECT_NAME", "instapage-app")
 
 
 # ============================================
@@ -169,34 +174,32 @@ async def spotify_oembed(url: str):
 
 
 # ============================================
-# DEPLOY TO NETLIFY (CSS INLINED + _HEADERS)
+# DEPLOY TO CLOUDFLARE PAGES (File-by-file)
 # ============================================
-# ============================================
-# DEPLOY WITH PATH-BASED ROUTING
-# ============================================
-MAIN_SITE_ID = os.getenv("NETLIFY_MAIN_SITE_ID")  # ⭐ Tumhari main site ka ID
+import subprocess
+import tempfile
+import shutil
+import pathlib
 
 @app.post("/api/deploy")
 async def deploy_page(req: DeployRequest):
-    if not NETLIFY_TOKEN:
-        raise HTTPException(status_code=500, detail="NETLIFY_TOKEN not configured")
     if not req.html or len(req.html) < 100:
         raise HTTPException(status_code=400, detail="Invalid HTML")
 
-    # ⭐ Username clean karo (path ke liye)
+    # ⭐ Username clean karo
     username = (req.username or "user").lower()
     username = re.sub(r'[^a-z0-9_-]', '', username)[:30]
     if not username:
         username = "user"
 
     try:
-        # Read preview.css
+        # ⭐ preview.css padho
         css_path = pathlib.Path(__file__).parent.parent / "frontend" / "preview.css"
         css_content = ""
         if css_path.exists():
             css_content = css_path.read_text(encoding="utf-8")
 
-        # Inject CSS into <head>
+        # ⭐ CSS inline karo
         if css_content and "</head>" in req.html:
             html_with_css = req.html.replace(
                 "</head>",
@@ -206,41 +209,44 @@ async def deploy_page(req: DeployRequest):
         else:
             html_with_css = req.html
 
-        # ⭐ Path: username/index.html
-        file_path = f"{username}/index.html"
+        # ⭐ Temporary folder banao
+        temp_dir = tempfile.mkdtemp()
+        try:
+            # user folder banao: temp_dir/username/index.html
+            user_dir = pathlib.Path(temp_dir) / username
+            user_dir.mkdir(parents=True, exist_ok=True)
+            
+            # index.html save karo
+            (user_dir / "index.html").write_text(html_with_css, encoding="utf-8")
 
-        # ⭐ Deploy to MAIN SITE (not new site)
-        headers = {
-            "Authorization": f"Bearer {NETLIFY_TOKEN}",
-            "Content-Type": "application/zip",
-        }
-
-        # Create ZIP with folder structure
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-            zf.writestr(file_path, html_with_css)
-            zf.writestr(
-                "_headers",
-                "/*\n  Content-Type: text/html; charset=utf-8\n"
-            )
-        zip_buffer.seek(0)
-
-        async with httpx.AsyncClient(timeout=60.0) as http:
-            # ⭐ Deploy to existing site (main site ID)
-            resp = await http.post(
-                f"https://api.netlify.com/api/v1/sites/{MAIN_SITE_ID}/deploys",
-                headers=headers,
-                content=zip_buffer.getvalue(),
+            # ⭐ Wrangler se deploy karo
+            result = subprocess.run(
+                [
+                    "wrangler", "pages", "deploy",
+                    str(temp_dir),  # folder path
+                    f"--project-name={CLOUDFLARE_PROJECT_NAME}",
+                    "--commit-dirty=true",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=120,
             )
 
-            if resp.status_code not in (200, 201):
-                print(f"[NETLIFY ERROR] {resp.status_code}: {resp.text}")
-                raise HTTPException(status_code=500, detail=f"Netlify error: {resp.text[:200]}")
+            if result.returncode != 0:
+                print(f"[WRANGLER ERROR] {result.stderr}")
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Wrangler failed: {result.stderr[:300]}"
+                )
 
-            data = resp.json()
-            # ⭐ URL = main site + username path
-            site_url = data.get("ssl_url") or data.get("url")
-            user_url = f"{site_url}/{username}"
+            print(f"[WRANGLER OUTPUT] {result.stdout[-500:]}")
+
+        finally:
+            # Temp folder delete karo
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+        # ⭐ User link banao
+        user_url = f"https://{CLOUDFLARE_PROJECT_NAME}.pages.dev/{username}"
 
         return {
             "success": True,
@@ -250,10 +256,11 @@ async def deploy_page(req: DeployRequest):
 
     except HTTPException:
         raise
+    except subprocess.TimeoutExpired:
+        raise HTTPException(status_code=500, detail="Deploy timed out")
     except Exception as e:
         print(f"[ERROR] Deploy failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 # ============================================
 # MOUNT FRONTEND
 # ============================================
