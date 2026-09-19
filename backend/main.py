@@ -2,12 +2,12 @@ import os
 import json
 import re
 import io
-import zipfile
-import hashlib
+import subprocess
+import tempfile
+import shutil
 import pathlib
 import httpx
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from openai import AsyncOpenAI
@@ -31,15 +31,11 @@ client = AsyncOpenAI(
     base_url="https://api.groq.com/openai/v1",
 )
 MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-
-# ⭐ Cloudflare credentials
-CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
-CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN")
 CLOUDFLARE_PROJECT_NAME = os.getenv("CLOUDFLARE_PROJECT_NAME", "instapage-app")
 
 
 # ============================================
-# INPUT VALIDATION
+# INPUT MODELS
 # ============================================
 class PageData(BaseModel):
     name: str = Field(..., min_length=1, max_length=40)
@@ -107,6 +103,9 @@ RULES:
 - Respond with JSON only."""
 
 
+# ============================================
+# GENERATE STYLE
+# ============================================
 @app.post("/api/generate-style")
 async def generate_style(data: PageData):
     hobbies_str = ", ".join(data.hobbies) if data.hobbies else "none"
@@ -174,32 +173,29 @@ async def spotify_oembed(url: str):
 
 
 # ============================================
-# DEPLOY TO CLOUDFLARE PAGES (File-by-file)
+# DEPLOY TO CLOUDFLARE PAGES (with frontend files)
 # ============================================
-import subprocess
-import tempfile
-import shutil
-import pathlib
-
 @app.post("/api/deploy")
 async def deploy_page(req: DeployRequest):
     if not req.html or len(req.html) < 100:
         raise HTTPException(status_code=400, detail="Invalid HTML")
 
-    # ⭐ Username clean karo
+    # Username clean karo
     username = (req.username or "user").lower()
     username = re.sub(r'[^a-z0-9_-]', '', username)[:30]
     if not username:
         username = "user"
 
+    temp_dir = None
     try:
-        # ⭐ preview.css padho
+        # preview.css padho
         css_path = pathlib.Path(__file__).parent.parent / "frontend" / "preview.css"
         css_content = ""
         if css_path.exists():
             css_content = css_path.read_text(encoding="utf-8")
+            print(f"[INFO] Loaded preview.css: {len(css_content)} chars")
 
-        # ⭐ CSS inline karo
+        # CSS inline karo
         if css_content and "</head>" in req.html:
             html_with_css = req.html.replace(
                 "</head>",
@@ -209,44 +205,52 @@ async def deploy_page(req: DeployRequest):
         else:
             html_with_css = req.html
 
-        # ⭐ Temporary folder banao
+        # Temp folder banao
         temp_dir = tempfile.mkdtemp()
-        try:
-            # user folder banao: temp_dir/username/index.html
-            user_dir = pathlib.Path(temp_dir) / username
-            user_dir.mkdir(parents=True, exist_ok=True)
-            
-            # index.html save karo
-            (user_dir / "index.html").write_text(html_with_css, encoding="utf-8")
+        temp_path = pathlib.Path(temp_dir)
 
-            # ⭐ Wrangler se deploy karo
-            result = subprocess.run(
-    [
-        "wrangler", "pages", "deploy",
-        str(temp_dir),
-        f"--project-name={CLOUDFLARE_PROJECT_NAME}",
-        "--branch=main",           # ⭐ Ye add karo
-        "--commit-dirty=true",
-    ],
-    capture_output=True,
-    text=True,
-    timeout=120,
-)
+        # Frontend files copy karo (landing page, CSS, JS)
+        frontend_src = pathlib.Path(__file__).parent.parent / "frontend"
+        if frontend_src.exists():
+            for item in frontend_src.iterdir():
+                if item.name in ["node_modules", ".git"]:
+                    continue
+                if item.is_file():
+                    shutil.copy2(item, temp_path / item.name)
+                elif item.is_dir():
+                    shutil.copytree(item, temp_path / item.name, dirs_exist_ok=True)
+            print(f"[INFO] Copied frontend files")
 
-            if result.returncode != 0:
-                print(f"[WRANGLER ERROR] {result.stderr}")
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Wrangler failed: {result.stderr[:300]}"
-                )
+        # User ka folder + index.html banao
+        user_dir = temp_path / username
+        user_dir.mkdir(parents=True, exist_ok=True)
+        (user_dir / "index.html").write_text(html_with_css, encoding="utf-8")
+        print(f"[INFO] Created {username}/index.html")
 
-            print(f"[WRANGLER OUTPUT] {result.stdout[-500:]}")
+        # Wrangler deploy
+        result = subprocess.run(
+            [
+                "wrangler", "pages", "deploy",
+                str(temp_path),
+                f"--project-name={CLOUDFLARE_PROJECT_NAME}",
+                "--branch=main",
+                "--commit-dirty=true",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
 
-        finally:
-            # Temp folder delete karo
-            shutil.rmtree(temp_dir, ignore_errors=True)
+        if result.returncode != 0:
+            print(f"[WRANGLER ERROR] {result.stderr}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Wrangler failed: {result.stderr[:300]}"
+            )
 
-        # ⭐ User link banao
+        print(f"[WRANGLER OUTPUT] {result.stdout[-500:]}")
+
+        # User URL
         user_url = f"https://{CLOUDFLARE_PROJECT_NAME}.pages.dev/{username}/"
 
         return {
@@ -262,8 +266,13 @@ async def deploy_page(req: DeployRequest):
     except Exception as e:
         print(f"[ERROR] Deploy failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if temp_dir:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+
 # ============================================
-# MOUNT FRONTEND
+# MOUNT FRONTEND (for local dev)
 # ============================================
 app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")
 
