@@ -221,16 +221,17 @@ async def deploy_page(req: DeployRequest):
 
             # ⭐ Wrangler se deploy karo
             result = subprocess.run(
-                [
-                    "wrangler", "pages", "deploy",
-                    str(temp_dir),  # folder path
-                    f"--project-name={CLOUDFLARE_PROJECT_NAME}",
-                    "--commit-dirty=true",
-                ],
-                capture_output=True,
-                text=True,
-                timeout=120,
-            )
+    [
+        "wrangler", "pages", "deploy",
+        str(temp_dir),
+        f"--project-name={CLOUDFLARE_PROJECT_NAME}",
+        "--branch=main",           # ⭐ Ye add karo
+        "--commit-dirty=true",
+    ],
+    capture_output=True,
+    text=True,
+    timeout=120,
+)
 
             if result.returncode != 0:
                 print(f"[WRANGLER ERROR] {result.stderr}")
