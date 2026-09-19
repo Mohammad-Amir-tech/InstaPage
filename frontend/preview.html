@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="#0f0c29">
+    <title>InstaPage</title>
+    <link rel="stylesheet" href="preview.css">
+</head>
+<body>
+    <canvas id="bgCanvas"></canvas>
+    <div class="mesh-bg" id="meshBg"></div>
+
+    <div class="loading" id="loading">
+        <div class="loader"></div>
+        <p class="loading-text">🎨 AI designing your page...</p>
+    </div>
+
+    <main class="page" id="page" style="display:none;">
+        <!-- HERO -->
+        <section class="hero">
+            <div class="avatar-wrap">
+                <div class="avatar-ring"></div>
+                <img id="profile-photo" class="avatar" src="" alt="profile">
+            </div>
+            <h1 class="name" id="nameEl"></h1>
+            <p class="tagline" id="taglineEl"></p>
+            <div class="meta-pills" id="metaPills"></div>
+        </section>
+
+        <!-- INTERESTS -->
+        <section class="section" id="interestsSection" style="display:none;">
+            <h2 class="section-title">Interests</h2>
+            <div class="interests" id="interestsList"></div>
+        </section>
+
+        <!-- MUSIC -->
+        <section class="section" id="musicSection" style="display:none;">
+            <h2 class="section-title">On Repeat</h2>
+            <div class="music-card" id="musicCard">
+                <div class="music-art" id="musicArt"><span>♪</span></div>
+                <div class="music-info">
+                    <div class="music-song" data-role="song"></div>
+                    <div class="music-artist" data-role="artist"></div>
+                </div>
+                <a class="music-play" data-role="play" href="#" target="_blank" rel="noopener noreferrer">▶</a>
+            </div>
+        </section>
+
+        <!-- GALLERY -->
+        <section class="section" id="gallerySection" style="display:none;">
+            <h2 class="section-title">Gallery</h2>
+            <div class="gallery" id="gallery"></div>
+        </section>
+
+        <!-- LINKS -->
+        <section class="section" id="linksSection" style="display:none;">
+            <h2 class="section-title">Find Me</h2>
+            <div class="links" id="links"></div>
+        </section>
+
+        <!-- ⭐ DEPLOY BUTTON — YE ZAROORI HAI -->
+        <button class="deploy-btn" id="deployBtn">🚀 Deploy & Get Link</button>
+
+        <!-- FOOTER -->
+        <footer class="page-footer">
+            <span id="footerName"></span>
+            <br>
+            <span class="powered">Powered by InstaPage</span>
+        </footer>
+    </main>
+
+    <div class="lightbox" id="lightbox">
+        <img class="lightbox-img" id="lightboxImg" src="" alt="Zoom">
+    </div>
+
+    <script src="preview.js"></script>
+</body>
+</html>

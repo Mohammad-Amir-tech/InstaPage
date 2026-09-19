@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="InstaPage — Turn your Instagram bio into a stunning personal page in 30 seconds. Free, beautiful, mobile-first.">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>InstaPage — Your Instagram Bio, Upgraded</title>
+    <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="bgCanvas"></canvas>
+    <div class="mesh-bg"></div>
+
+    <div class="container">
+        <!-- ================= NAVBAR ================= -->
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-icon">✨</span>
+                <span class="logo-text">InstaPage</span>
+            </div>
+            <div class="nav-links">
+                <a href="#how" class="nav-link">How it works</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#create" class="nav-cta">Create Yours →</a>
+            </div>
+        </nav>
+
+        <!-- ================= HERO ================= -->
+        <section class="hero-section">
+            <div class="badge">
+                <span class="badge-dot"></span>
+                <span>Free · No signup · 30 seconds</span>
+            </div>
+
+            <h1 class="main-title">
+                Your Instagram bio,<br>
+                <span class="gradient-text">beautifully upgraded.</span>
+            </h1>
+
+            <p class="main-subtitle">
+                Turn your boring link-in-bio into a <strong>stunning personal page</strong>.
+                AI designs it, we host it, you share the link. <em>No coding. No cost.</em>
+            </p>
+
+            <div class="hero-cta">
+                <a href="#create" class="btn-primary-hero">
+                    ✨ Create Your Page
+                </a>
+                <p class="hero-hint">Takes less than 30 seconds</p>
+            </div>
+
+            <!-- Fake stats -->
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-num">100%</div>
+                    <div class="stat-label">Free</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <div class="stat-num">30s</div>
+                    <div class="stat-label">Setup time</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <div class="stat-num">∞</div>
+                    <div class="stat-label">Customization</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= HOW IT WORKS ================= -->
+        <section class="section-block" id="how">
+            <div class="section-badge">HOW IT WORKS</div>
+            <h2 class="section-heading">From bio to beautiful<br>in three simple steps</h2>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <div class="step-icon">✍️</div>
+                    <h3 class="step-title">Fill in your details</h3>
+                    <p class="step-desc">
+                        Just your name, hobbies, and a favourite song. We handle the rest.
+                    </p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <div class="step-icon">🎨</div>
+                    <h3 class="step-title">AI designs your page</h3>
+                    <p class="step-desc">
+                        Our AI creates a unique, premium design tailored to your personality.
+                    </p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <div class="step-icon">🚀</div>
+                    <h3 class="step-title">Share your link</h3>
+                    <p class="step-desc">
+                        One click to deploy. Copy the link, paste it in your Instagram bio. Done.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= FEATURES ================= -->
+        <section class="section-block" id="features">
+            <div class="section-badge">FEATURES</div>
+            <h2 class="section-heading">Everything you need,<br>nothing you don't</h2>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">AI-generated designs</h3>
+                    <p class="feature-desc">Every page is unique. Colors, fonts, and layout matched to your vibe.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎵</div>
+                    <h3 class="feature-title">Favorite music card</h3>
+                    <p class="feature-desc">Show what you're listening to with a Spotify/YouTube link.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3 class="feature-title">Photo gallery</h3>
+                    <p class="feature-desc">Display up to 9 photos of your work, life, or achievements.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">30+ interests</h3>
+                    <p class="feature-desc">Show the world what you love — from music to coding to anime.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Mobile-first</h3>
+                    <p class="feature-desc">Looks perfect on every phone. Because 95% of your visitors are on mobile.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Instant hosting</h3>
+                    <p class="feature-desc">We host your page for free. You just share the link.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CREATE FORM ================= -->
+        <section class="section-block create-block" id="create">
+            <div class="section-badge">CREATE YOURS</div>
+            <h2 class="section-heading">Let's build your page</h2>
+            <p class="section-subheading">Fill in what you'd like to show. Only your name is required.</p>
+
+            <form class="form-card" id="pageForm">
+                <!-- SECTION 1: Fetch -->
+                <div class="form-section">
+                    <label class="section-label">
+                        <span class="step-number">1</span>
+                        Instagram (optional)
+                    </label>
+                    <div class="fetch-row">
+                        <input type="text" id="instaUsername" placeholder="@yourusername" />
+                        <button type="button" id="fetchBtn" class="btn-secondary">Auto-fill</button>
+                    </div>
+                    <p class="hint" id="fetchHint">Or skip this and fill manually below ↓</p>
+                </div>
+
+                <!-- SECTION 2: Basic Info -->
+                <div class="form-section">
+                    <label class="section-label">
+                        <span class="step-number">2</span>
+                        Your info
+                    </label>
+                    <input type="text" id="fullName" placeholder="Your name *" maxlength="40" required />
+                    <textarea id="bio" placeholder="Short bio — hobby, city, what you do" maxlength="120" rows="2"></textarea>
+
+                    <div class="photo-upload">
+                        <input type="file" id="photoInput" accept="image/*" hidden />
+                        <div class="photo-preview" id="photoPreview">
+                            <span>📷 Upload profile</span>
+                        </div>
+                    </div>
+
+                    <div class="row-2">
+                        <input type="number" id="age" placeholder="Age (optional)" min="1" max="120" />
+                        <input type="date" id="dob" placeholder="DOB (optional)" />
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Interests -->
+                <div class="form-section">
+                    <label class="section-label">
+                        <span class="step-number">3</span>
+                        Your interests <span class="optional-tag">(pick up to 8)</span>
+                    </label>
+                    <div class="hobby-categories" id="hobbyCategories"></div>
+                </div>
+
+                <!-- SECTION 4: Gallery -->
+                <div class="form-section">
+                    <label class="section-label">
+                        <span class="step-number">4</span>
+                        Photo gallery <span class="optional-tag">(up to 9)</span>
+                    </label>
+                    <input type="file" id="galleryInput" accept="image/*" multiple hidden />
+                    <div class="gallery-grid" id="galleryGrid">
+                        <div class="gallery-add" id="galleryAdd">
+                            <span>+</span>
+                            <p>Add photos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: Music -->
+                <div class="form-section">
+                    <label class="section-label">
+                        <span class="step-number">5</span>
+                        Favorite music <span class="optional-tag">(optional)</span>
+                    </label>
+                    <input type="text" id="favSong" placeholder="Song name (e.g. Kesariya)" maxlength="60" />
+                    <input type="text" id="favArtist" placeholder="Artist (e.g. Arijit Singh)" maxlength="40" />
+                    <input type="url" id="favMusicLink" placeholder="Spotify / YouTube link (optional)" />
+                </div>
+
+                <!-- SECTION 6: Links -->
+                <div class="form-section">
+                    <label class="section-label">
+                        <span class="step-number">6</span>
+                        Add links
+                    </label>
+                    <div id="linksContainer"></div>
+                    <button type="button" id="addLinkBtn" class="btn-add">+ Add another link</button>
+                </div>
+
+                <!-- SECTION 7: Theme -->
+                <div class="form-section">
+                    <label class="section-label">
+                        <span class="step-number">7</span>
+                        Choose a theme
+                    </label>
+                    <div class="theme-grid">
+                        <div class="theme-card" data-theme="soft-gradient">
+                            <div class="theme-preview theme-soft"></div>
+                            <span>Soft</span>
+                        </div>
+                        <div class="theme-card" data-theme="neon-glow">
+                            <div class="theme-preview theme-neon"></div>
+                            <span>Neon</span>
+                        </div>
+                        <div class="theme-card" data-theme="minimal-beige">
+                            <div class="theme-preview theme-beige"></div>
+                            <span>Minimal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="generateBtn" class="btn-primary">
+                    ✨ Generate My Page
+                </button>
+            </form>
+        </section>
+
+        <!-- ================= FAQ ================= -->
+        <section class="section-block">
+            <div class="section-badge">FAQ</div>
+            <h2 class="section-heading">Common questions</h2>
+
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>Is it really free?</summary>
+                    <p>Yes. 100% free, no credit card, no signup. Just create and share.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Do I need to know coding?</summary>
+                    <p>Nope. Just fill in the form — our AI handles everything.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How long does it take?</summary>
+                    <p>About 30 seconds from start to live page.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I edit my page later?</summary>
+                    <p>Yes — just come back and regenerate. Or contact us to update.</p>
+                </details>
+            </div>
+        </section>
+
+        <!-- ================= FOOTER ================= -->
+        <footer class="site-footer">
+            <div class="footer-logo">
+                <span class="logo-icon">✨</span>
+                <span class="logo-text">InstaPage</span>
+            </div>
+            <p class="footer-tagline">Your Instagram bio, beautifully upgraded.</p>
+            <div class="footer-bottom">
+                Made with <span class="heart">❤️</span> by
+                <a href="https://github.com/Mohammad-Amir-tech" target="_blank" rel="noopener noreferrer">Mohammad Amir</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
